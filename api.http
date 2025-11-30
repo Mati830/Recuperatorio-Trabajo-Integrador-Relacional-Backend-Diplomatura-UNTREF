@@ -14,19 +14,19 @@ Content-Type: {{contentType}}
 ### 2. Obtener un contenido por ID
 # GET - Devuelve un contenido específico por su ID
 # Reemplaza ":id" con el ID del contenido que deseas obtener
-GET {{baseUrl}}/contenido/1
+GET {{baseUrl}}/contenido/122
 Content-Type: {{contentType}}
 
 ### 3. Filtrar contenidos por título
 # GET - Filtra contenidos por título
 # Reemplaza el valor del parámetro "titulo" con el título a buscar
-GET {{baseUrl}}/contenido?titulo=Matrix
+GET {{baseUrl}}/contenido?titulo=Guason
 Content-Type: {{contentType}}
 
 ### 4. Filtrar contenidos por género
 # GET - Filtra contenidos por género
 # Reemplaza el valor del parámetro "genero" con el género a buscar
-GET {{baseUrl}}/contenido?genero=Ciencia Ficción
+GET {{baseUrl}}/contenido?genero=Fantasia
 Content-Type: {{contentType}}
 
 ### 5. Filtrar contenidos por categoría
@@ -42,8 +42,8 @@ POST {{baseUrl}}/contenido
 Content-Type: {{contentType}}
 
 {
-  "titulo": "Nueva Película de Ejemplo",
-  "categoria_id": 1,
+  "titulo": "Nueva Película de Ejemplo333",
+  "categoria_id": 7,
   "resumen": "Esta es una descripción de ejemplo para una nueva película.",
   "temporadas": null,
   "trailer": "https://www.youtube.com/watch?v=ejemplo",
@@ -59,18 +59,18 @@ Content-Type: {{contentType}}
 
 {
   "titulo": "Nueva Serie de Ejemplo",
-  "categoria_id": 2,
+  "categoria_id": 1,
   "resumen": "Esta es una descripción de ejemplo para una nueva serie.",
   "temporadas": 3,
   "trailer": "https://www.youtube.com/watch?v=ejemplo",
-  "generos": [3, 4],
+  "generos": [3, 6],
   "actores": [4, 5, 6]
 }
 
 ### 8. Actualizar un contenido completo
 # PUT - Actualiza todos los campos de un contenido existente
 # Reemplaza ":id" con el ID del contenido que deseas actualizar
-PUT {{baseUrl}}/contenido/1
+PUT {{baseUrl}}/contenido/122
 Content-Type: {{contentType}}
 
 {
@@ -86,7 +86,7 @@ Content-Type: {{contentType}}
 ### 9. Actualizar parcialmente un contenido
 # PATCH - Actualiza solo algunos campos de un contenido existente
 # Reemplaza ":id" con el ID del contenido que deseas actualizar
-PATCH {{baseUrl}}/contenido/1
+PATCH {{baseUrl}}/contenido/122
 Content-Type: {{contentType}}
 
 {
@@ -97,7 +97,7 @@ Content-Type: {{contentType}}
 ### 10. Eliminar un contenido
 # DELETE - Elimina un contenido de la base de datos
 # Reemplaza ":id" con el ID del contenido que deseas eliminar
-DELETE {{baseUrl}}/contenido/1
+DELETE {{baseUrl}}/contenido/122
 Content-Type: {{contentType}}
 
 ### ========================================
@@ -105,15 +105,15 @@ Content-Type: {{contentType}}
 ### ========================================
 
 ### 11. Obtener todas las categorías
-GET {{baseUrl}}/categorias
+GET {{baseUrl}}/contenido/categorias
 Content-Type: {{contentType}}
 
 ### 12. Obtener todos los géneros
-GET {{baseUrl}}/generos
+GET {{baseUrl}}/contenido/generos
 Content-Type: {{contentType}}
 
 ### 13. Obtener todos los actores
-GET {{baseUrl}}/actores
+GET {{baseUrl}}/contenido/actores
 Content-Type: {{contentType}}
 
 ### ========================================
