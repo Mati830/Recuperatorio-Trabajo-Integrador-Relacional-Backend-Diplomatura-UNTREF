@@ -1,0 +1,161 @@
+### Variables de entorno
+@baseUrl = http://localhost:3000
+@contentType = application/json
+@adminToken = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwiZW1haWwiOiJhZG1AZXhhbXBsZS5jb20iLCJyb2xfaWQiOjEsInJvbF9ub21icmUiOiJhZG1pbmlzdHJhZG9yIiwiaWF0IjoxNzgyNDA5ODczLCJleHAiOjE3ODI0MTcwNzN9.w4-Ckvn4jrrx_bt-y9RnGUdUBG1ZgROJs-U4sAPAqTk
+@empleadoToken = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NiwiZW1haWwiOiJlbXBsZWFkb19wcnVlYmFAZXhhbXBsZS5jb20iLCJyb2xfaWQiOjIsInJvbF9ub21icmUiOiJlbXBsZWFkbyIsImlhdCI6MTc4MjQxMDE4NywiZXhwIjoxNzgyNDE3Mzg3fQ.EKk9pcKN8UMcRsjmRRv8mwZXFOEU9cGX-TivNUA6oz8
+
+### ========================================
+### PRUEBAS DE SEGURIDAD
+### ========================================
+
+### 1. Register sin password (Error 400)
+POST {{baseUrl}}/auth/register
+Content-Type: {{contentType}}
+
+{
+  "email": "user1@example.com",
+  "rol_id": 1
+}
+
+### 2. Register con rol inválido (Error 400)
+POST {{baseUrl}}/auth/register
+Content-Type: {{contentType}}
+
+{
+  "email": "user1@example.com",
+  "password": "Password123!",
+  "rol_id": 99
+}
+
+### 3. Login con credenciales incorrectas (Error 401)
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "user1@example.com",
+  "password": "ContrasenaIncorrecta"
+}
+
+### 4. Rate limit en /auth/login (6 intentos fallidos)
+# Ejecuta estas 6 peticiones secuencialmente.
+# Esperado: 401 en los primeros 5 y 429 en el 6to.
+
+### RL1 - intento fallido 1
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "adm@example.com",
+  "password": "WrongPass1!"
+}
+
+### RL2 - intento fallido 2
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "adm@example.com",
+  "password": "WrongPass2!"
+}
+
+### RL3 - intento fallido 3
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "adm@example.com",
+  "password": "WrongPass3!"
+}
+
+### RL4 - intento fallido 4
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "adm@example.com",
+  "password": "WrongPass4!"
+}
+
+### RL5 - intento fallido 5
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "adm@example.com",
+  "password": "WrongPass5!"
+}
+
+### RL6 - intento fallido 6 (debe devolver 429)
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "adm@example.com",
+  "password": "WrongPass6!"
+}
+
+### 5. Login administrador (obtener token)
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "adm@example.com",
+  "password": "Password123!"
+}
+
+### 6. Login empleado (obtener token)
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "empleado_prueba@example.com",
+  "password": "Password123!"
+}
+
+### 7. Acceso con token mal formado (Error 401)
+GET {{baseUrl}}/usuarios
+Authorization: Bearer malformed.token.value
+Content-Type: {{contentType}}
+
+### 8. Crear usuario sin token (Error 401)
+POST {{baseUrl}}/usuarios
+Content-Type: {{contentType}}
+
+{
+  "email": "user-sin-token@example.com",
+  "password": "Password123!",
+  "rol_id": 2
+}
+
+### 9. Crear usuario con token de empleado (Error 403)
+POST {{baseUrl}}/usuarios
+Authorization: {{empleadoToken}}
+Content-Type: {{contentType}}
+
+{
+  "email": "empleado2@example.com",
+  "password": "Password123!",
+  "rol_id": 2
+}
+
+### 10. Listar usuarios como administrador (debe funcionar)
+GET {{baseUrl}}/usuarios
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+### 11. Refresh token revocado o inválido (Error 401)
+POST {{baseUrl}}/auth/refresh-token
+Content-Type: {{contentType}}
+
+{
+  "refreshToken": "token-invalido"
+}
+
+### 12. SQL Injection en login (debe devolver 401/400, no autenticar)
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "adm@example.com' OR '1'='1",
+  "password": "anything"
+}

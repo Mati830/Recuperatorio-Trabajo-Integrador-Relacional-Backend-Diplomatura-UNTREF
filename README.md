@@ -1,4 +1,4 @@
-# Recuperatorio del Proyecto Integrador: CRUD con Node.js y MySQL
+# Ciberseguridad-backend: CRUD con Node.js y MySQL
 
 ## Descripción del Proyecto
 
@@ -176,4 +176,11 @@ Este proyecto te permitirá aplicar conceptos clave de desarrollo backend, dise�
 
 ---
 
-Recuerda mantener tu código limpio, documentado y seguir las buenas prácticas de desarrollo. 
+Recuerda mantener tu código limpio, documentado y seguir las buenas prácticas de desarrollo.
+## Seguridad
+
+La documentación detallada sobre seguridad, autenticación, logs y pruebas se ha movido a un archivo separado: [SECURITY.md](SECURITY.md).
+
+Resumen rápido aquí: autenticación por JWT + refresh tokens, contraseñas hasheadas con bcrypt, validación de entradas, cabeceras de seguridad (`helmet`), limitación de tasa para login y logs de auditoría con `winston`.
+
+Para ver la explicación completa, ejemplos de pruebas y ubicaciones de los archivos relevantes, revisá [SECURITY.md](SECURITY.md).

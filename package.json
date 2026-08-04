@@ -1,5 +1,5 @@
 {
-  "name": "recuperatorio-trabajo-integrador-relacional-backend-diplomatura-untref",
+  "name": "ciberseguridad-backend",
   "version": "1.0.0",
   "description": "En este proyecto, desarrollarás una plataforma de streaming usando Node.js y MySQL. La aplicación permitirá realizar operaciones CRUD (Crear, Leer, Actualizar, Eliminar) sobre una base de datos relacional, utilizando el archivo trailerflix.json como referencia para diseñar el modelo de datos.",
   "main": "app.js",
@@ -11,13 +11,17 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
+    "express-rate-limit": "^6.11.2",
+    "helmet": "^6.2.0",
+    "jsonwebtoken": "^9.0.3",
     "mysql2": "^3.15.3",
     "sequelize": "^6.37.7",
     "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-express": "^5.0.1"
-  },
-  "devDependencies": {}
+    "swagger-ui-express": "^5.0.1",
+    "winston": "^3.19.0"
+  }
 }

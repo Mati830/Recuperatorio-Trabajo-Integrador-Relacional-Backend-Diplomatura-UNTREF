@@ -1,7 +1,8 @@
 ### Variables de entorno
 @baseUrl = http://localhost:3000
 @contentType = application/json
-
+@adminToken = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwiZW1haWwiOiJhZG1AZXhhbXBsZS5jb20iLCJyb2xfaWQiOjEsInJvbF9ub21icmUiOiJhZG1pbmlzdHJhZG9yIiwiaWF0IjoxNzgyNDA5ODczLCJleHAiOjE3ODI0MTcwNzN9.w4-Ckvn4jrrx_bt-y9RnGUdUBG1ZgROJs-U4sAPAqTk
+@empleadoToken = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NiwiZW1haWwiOiJlbXBsZWFkb19wcnVlYmFAZXhhbXBsZS5jb20iLCJyb2xfaWQiOjIsInJvbF9ub21icmUiOiJlbXBsZWFkbyIsImlhdCI6MTc4MjQxMDE4NywiZXhwIjoxNzgyNDE3Mzg3fQ.EKk9pcKN8UMcRsjmRRv8mwZXFOEU9cGX-TivNUA6oz8
 ### ========================================
 ### ENDPOINTS DE CONTENIDO
 ### ========================================
@@ -135,4 +136,308 @@ Content-Type: {{contentType}}
 ### 16. Ruta no existente (Error 404)
 GET {{baseUrl}}/ruta-inexistente
 Content-Type: {{contentType}}
+
+### ========================================
+### AUTENTICACIÓN (REGISTER / LOGIN)
+### ========================================
+
+### 17. Registrar usuario (register)
+# POST - Crea un usuario con rol administrador o empleado
+POST {{baseUrl}}/auth/register
+Content-Type: {{contentType}}
+
+{
+  "email": "adm@example.com",
+  "password": "Password123!",
+  "rol_id": 1
+}
+
+### 18. Iniciar sesión (login)
+# POST - Devuelve un JWT si las credenciales son correctas
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "adm@example.com",
+  "password": "Password123!"
+}
+
+### PRUEBA: Rate limit en /auth/login (6 intentos fallidos)
+# Ejecuta secuencialmente estas 6 peticiones para corroborar el limiter.
+# Esperado: los primeros 5 intentos devuelven 401 (credenciales inválidas),
+# el 6º devuelve 429 con mensaje de 'Demasiados intentos'.
+
+### RL1 - intento fallido 1
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "adm@example.com",
+  "password": "WrongPass1!"
+}
+
+### RL2 - intento fallido 2
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "adm@example.com",
+  "password": "WrongPass2!"
+}
+
+### RL3 - intento fallido 3
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "adm@example.com",
+  "password": "WrongPass3!"
+}
+
+### RL4 - intento fallido 4
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "adm@example.com",
+  "password": "WrongPass4!"
+}
+
+### RL5 - intento fallido 5
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "adm@example.com",
+  "password": "WrongPass5!"
+}
+
+### RL6 - intento fallido 6 (debe devolver 429)
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "adm@example.com",
+  "password": "WrongPass6!"
+}
+
+### LOGIN ADMIN - guardar tokens (ejecutar si querés probar refresh/logout)
+# Ejecutar este login correcto y copiar `refreshToken` de la respuesta.
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "adm@example.com",
+  "password": "Password123!"
+}
+
+### REFRESH - usar refreshToken para obtener nuevo access token
+# Reemplazar `<refreshToken>` por el valor obtenido en el login anterior.
+POST {{baseUrl}}/auth/refresh-token
+Content-Type: {{contentType}}
+
+{
+  "refreshToken": "<refreshToken>"
+}
+
+### LOGOUT - revocar refresh token
+# Reemplazar `<refreshToken>` por el valor obtenido en el login anterior.
+POST {{baseUrl}}/auth/logout
+Content-Type: {{contentType}}
+
+{
+  "refreshToken": "<refreshToken>"
+}
+
+### REFRESH CON TOKEN REVOKED (debe fallar 401)
+POST {{baseUrl}}/auth/refresh-token
+Content-Type: {{contentType}}
+
+{
+  "refreshToken": "<refreshToken>"
+}
+
+### ACCESO CON TOKEN MALFORMADO (debe fallar 401)
+GET {{baseUrl}}/usuarios
+Authorization: Bearer malformed.token.value
+Content-Type: {{contentType}}
+
+### 19. Validación: register sin password (Error 400)
+POST {{baseUrl}}/auth/register
+Content-Type: {{contentType}}
+
+{
+  "email": "user1@example.com",
+  "rol_id": 1
+}
+
+### 20. Validación: register con rol inválido (Error 400)
+POST {{baseUrl}}/auth/register
+Content-Type: {{contentType}}
+
+{
+  "email": "user1@example.com",
+  "password": "Password123!",
+  "rol_id": 99
+}
+
+### 21. Validación: login con credenciales incorrectas (Error 401)
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "user1@example.com",
+  "password": "ContrasenaIncorrecta"
+}
+
+### ========================================
+### ENDPOINTS DE USUARIOS PROTEGIDOS
+### ========================================
+
+### 22. Listar usuarios (solo administrador)
+GET {{baseUrl}}/usuarios
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+### 23. Obtener usuario por ID (solo administrador)
+GET {{baseUrl}}/usuarios/1
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+### 24. Crear usuario empleado (solo administrador)
+POST {{baseUrl}}/usuarios
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+{
+  "email": "empleado1@example.com",
+  "password": "Password123!",
+  "rol_id": 2
+}
+
+### 25. Crear usuario sin token (debe fallar 401)
+POST {{baseUrl}}/usuarios
+Content-Type: {{contentType}}
+
+{
+  "email": "user-sin-token@example.com",
+  "password": "Password123!",
+  "rol_id": 2
+}
+
+### 26. Crear usuario con empleado (debe fallar 403)
+POST {{baseUrl}}/usuarios
+Authorization: {{empleadoToken}}
+Content-Type: {{contentType}}
+
+{
+  "email": "empleado2@example.com",
+  "password": "Password123!",
+  "rol_id": 2
+}
+
+### 27. Actualizar usuario (solo administrador)
+PUT {{baseUrl}}/usuarios/1
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+{
+  "email": "admin-actualizado@example.com",
+  "password": "NuevoPassword123!",
+  "rol_id": 1
+}
+
+### 28. Eliminar usuario (solo administrador)
+DELETE {{baseUrl}}/usuarios/1
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+### 29. Listar roles (público)
+GET {{baseUrl}}/roles
+Content-Type: {{contentType}}
+
+### ========================================
+### SECUENCIA DE PRUEBAS (SUGERIDA)
+### ========================================
+
+### 30. Login administrador (obtener token)
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "adm@example.com",
+  "password": "Password123!"
+}
+
+# Copiar el token de la respuesta y reemplazar en la variable @adminToken arriba.
+
+### 31. (Opcional) Seed roles vía script (terminal)
+# Ejecutar en terminal: `node scripts/seedRoles.js` si los roles no existen.
+
+### 32. Crear empleado con token admin (debe crear)
+POST {{baseUrl}}/usuarios
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+{
+  "email": "empleado_prueba@example.com",
+  "password": "Password123!",
+  "rol_id": 2
+}
+
+### 33. Login empleado (obtener token)
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "empleado_prueba@example.com",
+  "password": "Password123!"
+}
+
+### 34. Refrescar token de acceso
+# Usar refreshToken recibido en el login
+POST {{baseUrl}}/auth/refresh-token
+Content-Type: {{contentType}}
+
+{
+  "refreshToken": "<aquí
+  efreshToken obtenido en /auth/login>"
+}
+
+### 35. Logout / revocar refresh token
+POST {{baseUrl}}/auth/logout
+Content-Type: {{contentType}}
+
+{
+  "refreshToken": "<aquí va el refreshToken obtenido en /auth/login>"
+}
+
+# Copiar token de la respuesta y pegar en @empleadoToken.
+
+### 34. Intento crear usuario con token de empleado (debe fallar 403)
+POST {{baseUrl}}/usuarios
+Authorization: {{empleadoToken}}
+Content-Type: {{contentType}}
+
+{
+  "email": "user_from_empleado@example.com",
+  "password": "Password123!",
+  "rol_id": 2
+}
+
+### 35. Intento crear usuario sin token (debe fallar 401)
+POST {{baseUrl}}/usuarios
+Content-Type: {{contentType}}
+
+{
+  "email": "user_no_token@example.com",
+  "password": "Password123!",
+  "rol_id": 2
+}
+
+### 36. Listar usuarios como administrador (verificar existencia)
+GET {{baseUrl}}/usuarios
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
 
